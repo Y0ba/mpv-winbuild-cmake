@@ -1,0 +1,34 @@
+From 58173f3a0140f07cd3e9fb8fd8f7374778b97263 Mon Sep 17 00:00:00 2001
+From: Y0ba <Y0ba@users.noreply.github.com>
+Date: Fri, 1 May 2020 14:08:26 +0300
+Subject: [PATCH] forse zero initialized in HLSL
+
+---
+ spirv_hlsl.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/spirv_hlsl.cpp b/spirv_hlsl.cpp
+index f27163c..a98d489 100644
+--- a/spirv_hlsl.cpp
++++ b/spirv_hlsl.cpp
+@@ -1140,7 +1140,7 @@ void CompilerHLSL::declare_undefined_values()
+ 	bool emitted = false;
+ 	ir.for_each_typed_id<SPIRUndef>([&](uint32_t, const SPIRUndef &undef) {
+ 		string initializer;
+-		if (options.force_zero_initialized_variables && type_can_zero_initialize(this->get<SPIRType>(undef.basetype)))
++		if (type_can_zero_initialize(this->get<SPIRType>(undef.basetype)))
+ 			initializer = join(" = ", to_zero_initialized_expression(undef.basetype));
+ 
+ 		statement("static ", variable_decl(this->get<SPIRType>(undef.basetype), to_name(undef.self), undef.self),
+@@ -1387,7 +1387,7 @@ void CompilerHLSL::emit_resources()
+ 				}
+ 
+ 				string initializer;
+-				if (options.force_zero_initialized_variables && var.storage == StorageClassPrivate &&
++				if (var.storage == StorageClassPrivate &&
+ 				    !var.initializer && !var.static_expression && type_can_zero_initialize(get_variable_data_type(var)))
+ 				{
+ 					initializer = join(" = ", to_zero_initialized_expression(get_variable_data_type_id(var)));
+-- 
+2.25.1
+
